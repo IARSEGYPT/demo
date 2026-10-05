@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Teacher guide: Performance Assessment</title>
+<style>
+:root{--paper:#eef1f4;--card:#fff;--ink:#16222b;--mute:#6b7f8c;--line:#d9e1e6;--acc:#0d5f60;--soft:#dfeceb;--nav:#0f1c23;--gold:#a8720f;--l5:#155e45;--l3:#2f6f96;--l1:#a33a3a;
+ --safe-t:env(safe-area-inset-top,0px);--safe-b:env(safe-area-inset-bottom,0px)}
+@media(prefers-color-scheme:dark){:root:not([data-theme="light"]){--paper:#0b1216;--card:#111b21;--ink:#e3edf1;--mute:#8099a5;--line:#22333b;--acc:#4ab5ad;--soft:#122e2f;--nav:#080f13}}
+*{box-sizing:border-box}html,body{height:100%;margin:0}
+body{background:var(--paper);color:var(--ink);font:16px/1.6 "Public Sans","Avenir Next","Geeza Pro","Segoe UI",Tahoma,system-ui,sans-serif;display:flex;flex-direction:column;padding-top:var(--safe-t);padding-bottom:var(--safe-b)}
+.stage{flex:1;display:grid;grid-template-columns:minmax(0,5fr) minmax(0,6fr);gap:40px;align-items:center;max-width:1100px;width:100%;margin:0 auto;padding:24px;overflow:auto}
+@media(max-width:800px){.stage{grid-template-columns:1fr;gap:20px}}
+.txt h1{font-size:clamp(1.7rem,4vw,2.6rem);line-height:1.15;margin:0 0 12px;letter-spacing:-.02em}
+.txt p{color:var(--mute);margin:0 0 14px;max-width:46ch}
+.txt ol{padding-inline-start:20px;margin:0;display:grid;gap:8px}
+.txt li b{color:var(--acc)}
+.step{display:inline-block;font-size:14px;font-weight:600;color:var(--acc);margin-bottom:8px}
+.slide{display:none}.slide.on{display:contents}
+.mock{background:var(--card);border:1px solid var(--line);border-radius:14px;box-shadow:0 8px 24px -16px rgba(18,35,44,.45);overflow:hidden;font-size:14px}
+.bar{background:var(--nav);color:#b9ccd5;padding:8px 14px;font-size:13px;display:flex;gap:6px;align-items:center}
+.bar i{width:9px;height:9px;border-radius:50%;background:#2c4350}
+.body{padding:16px;display:grid;gap:10px}
+.row{display:flex;gap:8px;align-items:center;justify-content:space-between;padding:10px 12px;border:1px solid var(--line);border-radius:9px}
+.btn{display:inline-block;padding:7px 14px;border-radius:8px;border:1px solid var(--line);font-weight:600;background:var(--card)}
+.btn.p{background:var(--acc);color:#fff;border-color:var(--acc)}
+.tag{padding:2px 9px;border-radius:99px;font-size:12px;font-weight:600;background:var(--soft);color:var(--acc)}
+.tag.a{background:#f6e2e2;color:var(--l1)}
+.nums{display:flex;gap:6px}.nums span{width:34px;height:34px;border-radius:8px;border:1px solid var(--line);display:grid;place-items:center;font-weight:600}
+.nums span.s{background:var(--acc);color:#fff;border-color:var(--acc)}
+.hl{outline:3px solid var(--gold);outline-offset:2px;animation:pulse 1.4s ease-in-out infinite}
+@keyframes pulse{50%{outline-color:transparent}}
+@media(prefers-reduced-motion:reduce){.hl{animation:none}}
+.nav{display:flex;flex-wrap:wrap;gap:6px}.nav span{padding:5px 11px;border-radius:7px;background:var(--soft);color:var(--acc);font-weight:600;font-size:13px}
+.chain{display:flex;flex-wrap:wrap;gap:6px;align-items:center;font-weight:600}.chain b{color:var(--mute)}
+.cap{background:var(--nav);color:#e3edf1;text-align:center;padding:12px 20px;min-height:52px;font-size:15px}
+.ctl{display:flex;gap:10px;align-items:center;justify-content:center;padding:10px;flex-wrap:wrap}
+.ctl button{font:inherit;font-weight:600;padding:8px 16px;border-radius:9px;border:1px solid var(--line);background:var(--card);color:var(--ink);cursor:pointer}
+.ctl button.p{background:var(--acc);border-color:var(--acc);color:#fff}
+.ctl button:focus-visible{outline:3px solid var(--gold);outline-offset:2px}
+.prog{height:4px;background:var(--line)}.prog div{height:100%;width:0;background:var(--acc);transition:width .4s}
+.ctl label{font-size:14px;color:var(--mute);display:flex;gap:6px;align-items:center}
+</style>
+</head>
+<body>
+<div class="prog"><div id="pg"></div></div>
+<main class="stage" id="stage"></main>
+<div class="cap" id="cap" aria-live="polite"></div>
+<div class="ctl">
+  <button id="prev" aria-label="Previous slide">Back</button>
+  <button id="play" class="p">Play as video</button>
+  <button id="next" aria-label="Next slide">Next</button>
+  <select id="lang" aria-label="Language" style="font:inherit;font-size:14px;padding:6px;border-radius:8px;border:1px solid var(--line);background:var(--card);color:var(--ink)"><option value="en">English</option><option value="ar">العربية</option></select><label><input type="checkbox" id="voice" checked> <span id="lvo">Voice-over</span></label><select id="vsel" aria-label="English voice" style="font:inherit;font-size:14px;padding:6px;border-radius:8px;border:1px solid var(--line);background:var(--card);color:var(--ink);max-width:200px"></select><label><span id="lsp">Speed</span> <input type="range" id="rate" min="0.8" max="1.2" step="0.05" value="0.95"></label>
+  <span id="count" style="color:var(--mute);font-size:14px"></span><div id="vnote" style="flex-basis:100%;text-align:center;color:var(--mute);font-size:13px"></div>
+</div>
+
+<script>
+const dots='<div class="bar"><i></i><i></i><i></i>&nbsp;Performance Assessment</div>';
+const S=[
+{t:'Welcome to Performance Assessment',p:'Everything you need to take attendance and rate learners, from your phone or laptop, in about two minutes per learner.',
+ list:['Sign in','Take attendance','Assess a learner','Submit and move on','Reports and progress'],
+ cap:'Welcome. This short guide shows the five things you will do every class.',
+ mock:`${dots}<div class="body"><b style="font-size:18px">Performance Assessment</b><div class="nav"><span>Teacher</span><span style="opacity:.5">Admin</span></div><div class="row"><span>Choose your name</span><span>Select ▾</span></div><div class="row"><span>Password</span><span>••••••</span></div><span class="btn p hl" style="text-align:center">Sign in</span></div>`},
+{t:'1. Sign in',s:'Step 1',p:'Open the link, stay on the Teacher tab and pick your name from the list. Tick "Remember me" on your own phone.',
+ list:['Choose your name from the list','Type the password you were given','Tap <b>Sign in</b>','Forgot it? Tap <b>Forgot password?</b> or ask your administrator'],
+ cap:'Pick your name, enter your password and tap Sign in. Use Forgot password if you get stuck.',
+ mock:`${dots}<div class="body"><div class="row hl"><span>Choose your name</span><span>Select ▾</span></div><div class="row"><span>Password</span><span>••••••</span></div><div class="row"><span>☐ Show password</span><span>☑ Remember me</span></div><span class="btn p" style="text-align:center">Sign in</span></div>`},
+{t:'2. Your dashboard',s:'Step 2',p:'After signing in you see a card for each of your classes with today\'s attendance and the current session.',
+ list:['<b>Take attendance</b> starts today\'s register','<b>Assess learners</b> opens the rating screen','<b>Unfinished assessments</b> lists drafts to complete','The how-to guide can be hidden once you know it'],
+ cap:'Your dashboard shows each class you teach. Every action starts from these two buttons.',
+ mock:`${dots}<div class="body"><b style="font-size:18px">Hello, teacher</b><div class="row" style="display:block"><b>Class name</b><div style="color:var(--mute);margin:2px 0 10px">12 learners · Session 3</div><span class="btn p hl">◎ Take attendance</span> <span class="btn">✓ Assess learners</span></div><div class="row"><span>Unfinished assessments</span><span class="tag">2</span></div></div>`},
+{t:'3. Take attendance',s:'Step 3',p:'Mark everyone present first, then tap only the learners who are absent. It is faster than ticking each name.',
+ list:['Tap <b>All present</b>','Tap each absent learner','Press <b>Save Data</b>','Need the register later? Export CSV or Excel from Attendance'],
+ cap:'Tap All present, then tap anyone who is absent, and press Save Data.',
+ mock:`${dots}<div class="body"><div style="display:flex;justify-content:space-between"><b>Today\'s register</b><span class="btn hl">All present</span></div><div class="row"><span>Learner A</span><span class="tag">Present</span></div><div class="row"><span>Learner B</span><span class="tag a">Absent</span></div><div class="row"><span>Learner C</span><span class="tag">Present</span></div><span class="btn p" style="text-align:center">Save Data</span></div>`},
+{t:'4. Assess a learner',s:'Step 4',p:'Choose the session, tap a learner, then tap a number from 1 to 5 for each criterion. Comments are optional.',
+ list:['<b>5</b> Excellent · <b>4</b> Very Good · <b>3</b> Meets Expectations','<b>2</b> Needs Improvement · <b>1</b> Unsatisfactory','Weights are set by your administrator','Use <b>‹ Prev</b> and <b>Next ›</b> to move between learners'],
+ cap:'Tap a number for each criterion. Five is excellent, three meets expectations, one is unsatisfactory.',
+ mock:`${dots}<div class="body"><div class="row"><span class="btn">‹ Prev</span><b>Learner A</b><span class="btn">Next ›</span></div><div style="display:grid;gap:6px"><b>Professionalism &amp; Attitude</b><div class="nums hl" style="width:max-content"><span>1</span><span>2</span><span>3</span><span class="s">4</span><span>5</span></div></div><div class="row" style="color:var(--mute)">Add a comment (optional)</div></div>`},
+{t:'5. Submit and move on',s:'Step 5',p:'Submit when you are done, or save a draft and finish later. You return to the class list to pick the next learner.',
+ list:['<b>Submit assessment</b> marks it complete','<b>Save Data</b> keeps a draft to finish later','Drafts appear under <b>Unfinished assessments</b>','Completed work can be reviewed from <b>Assessments</b>'],
+ cap:'Press Submit assessment when finished, or Save Data to come back later.',
+ mock:`${dots}<div class="body"><div class="row"><span>Score</span><b>82% · Very Good</b></div><div class="row"><span>Status</span><span class="tag">Ready to submit</span></div><div style="display:flex;gap:8px"><span class="btn p hl">Submit assessment</span><span class="btn">Save Data</span></div></div>`},
+{t:'Reports and progress',s:'See results',p:'Reports show a learner\'s scores over time, by criterion and your feedback. Print them or share with the administrator.',
+ list:['<b>Learner report</b>: trend, criteria, feedback','<b>Class report</b>: who is doing well, who needs support','<b>Session report</b>: one session at a glance'],
+ cap:'Open Reports to see a learner, a class or a single session. You can print any of them.',
+ mock:`${dots}<div class="body"><b>Performance over the programme</b><svg viewBox="0 0 300 90" style="width:100%"><polyline points="10,70 70,55 130,60 190,35 250,25 290,18" fill="none" stroke="#0d5f60" stroke-width="3"/><circle cx="290" cy="18" r="5" fill="#0d5f60"/></svg><div class="row"><span>Excellent</span><span class="tag">2 sessions</span></div><div class="row"><span>Needs support</span><span class="tag a">1 learner</span></div></div>`},
+{t:'For administrators: how it fits together',s:'Setup',p:'Set things up in order and nothing is left without a parent. Teachers only see classes assigned to them.',
+ list:['Courses, Classes, Sessions, Learners come first','Users: add teachers and assign classes','Assessment criteria: weights, scale and bands','Analytics and Settings for cohort trends and backups'],
+ cap:'Administrators set up courses, classes, sessions and learners in that order, then assign teachers.',
+ mock:`${dots}<div class="body"><div class="chain"><span class="tag">Course</span><b>→</b><span class="tag">Class</span><b>→</b><span class="tag">Sessions</span><b>→</b><span class="tag">Learners</span><b>→</b><span class="tag">Assessments</span></div><div class="nav"><span>Dashboard</span><span>Assessments</span><span>Classes</span><span>Learners</span><span>Sessions</span><span>Attendance</span><span>Reports</span><span>Criteria</span><span>Users</span><span>Analytics</span><span>Settings</span></div></div>`}
+];
+const AR=[
+{t:"مرحبًا بكم في نظام تقييم الأداء",p:"كل ما تحتاجونه لتسجيل الحضور وتقييم المتعلمين، من هاتفكم أو حاسوبكم، في نحو دقيقتين لكل متعلم.",list:["تسجيل الدخول","تسجيل الحضور","تقييم متعلم","الإرسال والانتقال إلى التالي","التقارير والتقدّم"],cap:"مرحبًا بكم. يعرض هذا الدليل القصير الأمور الخمسة التي ستقومون بها في كل حصة."},
+{s:"الخطوة ١",t:"١. تسجيل الدخول",p:"افتح الرابط وابقَ في تبويب المعلم (Teacher)، ثم اختر اسمك من القائمة. فعّل «Remember me» على هاتفك الشخصي فقط.",list:["اختر اسمك من القائمة","اكتب كلمة المرور التي أُعطيت لك","اضغط <b>Sign in</b> (تسجيل الدخول)","نسيت كلمة المرور؟ اضغط <b>Forgot password?</b> أو اطلب المساعدة من المسؤول"],cap:"اختر اسمك، واكتب كلمة المرور، ثم اضغط Sign in. وإن نسيتها فاضغط Forgot password."},
+{s:"الخطوة ٢",t:"٢. لوحة التحكم",p:"بعد الدخول ترى بطاقة لكل صف تدرّسه، فيها حضور اليوم والحصة الحالية.",list:["<b>Take attendance</b> (تسجيل الحضور) لبدء كشف اليوم","<b>Assess learners</b> (تقييم المتعلمين) لفتح شاشة التقييم","<b>Unfinished assessments</b> (تقييمات غير مكتملة) لإكمال المسودات","يمكن إخفاء دليل الاستخدام بعد أن تعتادوا عليه"],cap:"تعرض لوحة التحكم كل صف تدرّسه، ومن هنا يبدأ كل إجراء بزرّين."},
+{s:"الخطوة ٣",t:"٣. تسجيل الحضور",p:"اضغط «الجميع حاضرون» أولًا، ثم اضغط على الغائبين فقط. هذا أسرع من وضع علامة أمام كل اسم.",list:["اضغط <b>All present</b> (الجميع حاضرون)","اضغط على كل متعلم غائب","اضغط <b>Save Data</b> (حفظ البيانات)","تحتاج الكشف لاحقًا؟ صدّره بصيغة CSV أو Excel من صفحة Attendance"],cap:"اضغط All present ثم اضغط على الغائبين، وبعدها Save Data."},
+{s:"الخطوة ٤",t:"٤. تقييم متعلم",p:"اختر الحصة، ثم اضغط على متعلم، ثم اضغط رقمًا من ١ إلى ٥ لكل معيار. التعليق اختياري.",list:["<b>5</b> ممتاز · <b>4</b> جيد جدًا · <b>3</b> يلبّي التوقعات","<b>2</b> يحتاج إلى تحسين · <b>1</b> غير مُرضٍ","الأوزان يحدّدها المسؤول","استخدم <b>‹ Prev</b> و<b>Next ›</b> للتنقل بين المتعلمين"],cap:"اضغط رقمًا لكل معيار: خمسة ممتاز، وثلاثة يلبّي التوقعات، وواحد غير مُرضٍ."},
+{s:"الخطوة ٥",t:"٥. الإرسال والانتقال",p:"أرسل التقييم عند الانتهاء، أو احفظ مسودة وأكمل لاحقًا. ستعود إلى قائمة الصف لاختيار المتعلم التالي.",list:["<b>Submit assessment</b> (إرسال التقييم) يجعله مكتملًا","<b>Save Data</b> يحفظ مسودة لإكمالها لاحقًا","تظهر المسودات تحت <b>Unfinished assessments</b>","يمكن مراجعة التقييمات المكتملة من <b>Assessments</b>"],cap:"اضغط Submit assessment عند الانتهاء، أو Save Data للعودة لاحقًا."},
+{s:"عرض النتائج",t:"التقارير والتقدّم",p:"تعرض التقارير درجات المتعلم عبر الوقت وحسب المعيار وملاحظاتك. يمكنك طباعتها أو مشاركتها مع المسؤول.",list:["<b>تقرير المتعلم</b>: الاتجاه والمعايير والملاحظات","<b>تقرير الصف</b>: من يتفوّق ومن يحتاج إلى دعم","<b>تقرير الحصة</b>: نظرة سريعة على حصة واحدة"],cap:"افتح Reports لعرض متعلم أو صف أو حصة واحدة. ويمكنك طباعة أي تقرير."},
+{s:"الإعداد",t:"للمسؤولين: كيف تترابط الأجزاء",p:"أعدّوا الأجزاء بالترتيب فلا يبقى شيء بلا أصل. يرى المعلمون الصفوف المسندة إليهم فقط.",list:["المقررات والصفوف والحصص والمتعلمون أولًا","Users: أضيفوا المعلمين وأسندوا إليهم الصفوف","Assessment criteria: الأوزان والمقياس والمستويات","Analytics وSettings لاتجاهات المجموعة والنسخ الاحتياطي"],cap:"يعدّ المسؤولون المقررات ثم الصفوف ثم الحصص ثم المتعلمين، ثم يسندون المعلمين."}
+];
+const VO=[
+"Welcome to the Performance Assessment system. In this short guide, you will learn the five things you do in every class: sign in, take attendance, assess a learner, submit your work, and check reports. It takes about two minutes per learner, and works on your phone or your laptop.",
+"Step one, sign in. Open the link and stay on the Teacher tab. Choose your name from the list, type the password you were given, and tap Sign in. On your own phone, tick Remember me. If you forget your password, tap Forgot password, or ask your administrator.",
+"Step two, your dashboard. After signing in, you see a card for each of your classes, with today's attendance and the current session. Tap Take attendance to start the register, or Assess learners to rate them. Any unfinished assessments are listed below, so you can complete them later.",
+"Step three, take attendance. Tap All present first, then tap only the learners who are absent. This is much faster than ticking every name. When you are done, press Save Data. You can export the register to CSV or Excel from the Attendance page.",
+"Step four, assess a learner. Choose the session, then tap a learner. For each criterion, tap a number from one to five. Five means excellent, four is very good, three meets expectations, two needs improvement, and one is unsatisfactory. You can add a comment if you wish. Use Previous and Next at the top to move between learners.",
+"Step five, submit and move on. When you have rated every criterion, press Submit assessment. If you need to stop, press Save Data to keep a draft, and finish later from Unfinished assessments. After submitting, you return to the class list to pick the next learner.",
+"Finally, reports. Open Reports to see a learner's progress over time, a whole class, or a single session. You can print any report.",
+"A note for administrators. Set things up in this order: courses, classes, sessions, then learners. Add your teachers under Users and assign them to classes. Then set the assessment criteria, weights and performance bands. Teachers only see the classes assigned to them. That is everything. Thank you for watching."
+];
+const VO_AR=[
+"مرحبًا بكم في نظام تقييم الأداء. في هذا الدليل القصير ستتعرفون على خمسة أمور تقومون بها في كل حصة: تسجيل الدخول، وتسجيل الحضور، وتقييم المتعلم، وإرسال التقييم، ومراجعة التقارير. يستغرق الأمر نحو دقيقتين لكل متعلم، ويعمل على هاتفكم أو حاسوبكم.",
+"الخطوة الأولى: تسجيل الدخول. افتح الرابط وابقَ في تبويب المعلم. اختر اسمك من القائمة، واكتب كلمة المرور التي أُعطيت لك، ثم اضغط على زر تسجيل الدخول. على هاتفك الشخصي فعّل خيار تذكّرني. وإن نسيت كلمة المرور فاضغط على نسيت كلمة المرور، أو اطلب المساعدة من المسؤول.",
+"الخطوة الثانية: لوحة التحكم. بعد تسجيل الدخول ترى بطاقة لكل صف تدرّسه، فيها حضور اليوم والحصة الحالية. اضغط على تسجيل الحضور لبدء الكشف، أو على تقييم المتعلمين لتقييمهم. وتظهر التقييمات غير المكتملة في الأسفل لتكملها لاحقًا.",
+"الخطوة الثالثة: تسجيل الحضور. اضغط أولًا على الجميع حاضرون، ثم اضغط على المتعلمين الغائبين فقط. هذا أسرع كثيرًا من وضع علامة أمام كل اسم. وعند الانتهاء اضغط على حفظ البيانات. ويمكنك تصدير الكشف بصيغة سي إس في أو إكسل من صفحة الحضور.",
+"الخطوة الرابعة: تقييم متعلم. اختر الحصة، ثم اضغط على متعلم. لكل معيار اضغط رقمًا من واحد إلى خمسة. خمسة تعني ممتاز، وأربعة جيد جدًا، وثلاثة يلبّي التوقعات، واثنان يحتاج إلى تحسين، وواحد غير مُرضٍ. ويمكنك إضافة تعليق إن شئت. واستخدم السابق والتالي في الأعلى للتنقل بين المتعلمين.",
+"الخطوة الخامسة: الإرسال والانتقال. بعد تقييم كل المعايير اضغط على إرسال التقييم. وإن أردت التوقف فاضغط على حفظ البيانات لحفظ مسودة، وأكمل لاحقًا من التقييمات غير المكتملة. وبعد الإرسال تعود إلى قائمة الصف لاختيار المتعلم التالي.",
+"وأخيرًا، التقارير. افتح التقارير لترى تقدّم المتعلم عبر الوقت، أو صفًّا كاملًا، أو حصة واحدة. ويمكنك طباعة أي تقرير.",
+"ملاحظة للمسؤولين. أعدّوا النظام بهذا الترتيب: المقررات، ثم الصفوف، ثم الحصص، ثم المتعلمين. أضيفوا المعلمين من صفحة المستخدمين وأسندوا إليهم الصفوف. ثم حدّدوا معايير التقييم والأوزان ومستويات الأداء. ولا يرى المعلمون إلا الصفوف المسندة إليهم. وهذا كل شيء. شكرًا لمتابعتكم."
+];
+const UI={en:{back:'Back',play:'Play as video',pause:'Pause',next:'Next',vo:'Voice-over',sp:'Speed',title:'Teacher guide: Performance Assessment',nov:''},
+ ar:{back:'السابق',play:'تشغيل كفيديو',pause:'إيقاف مؤقت',next:'التالي',vo:'التعليق الصوتي',sp:'السرعة',title:'دليل المعلم: تقييم الأداء',nov:'لا يوجد صوت عربي على هذا الجهاز، لذلك ستتقدم الشرائح تلقائيًا مع النص فقط. على جهاز Mac أضف صوتًا عربيًا من إعدادات النظام ← إمكانية الوصول ← المحتوى المنطوق.'}};
+const st=document.getElementById('stage');
+const $=id=>document.getElementById(id);
+let i=0,playing=false,timer=null,run=0,voices=[],lang='en';
+const X=n=>lang==='ar'?AR[n]:S[n], VOt=n=>lang==='ar'?VO_AR[n]:VO[n];
+function render(){st.dir=lang==='ar'?'rtl':'ltr';
+ st.innerHTML=S.map((s,n)=>{const x=X(n);return `<section class="slide" id="s${n}"><div class="txt" dir="${lang==='ar'?'rtl':'ltr'}" lang="${lang}">${x.s?`<span class="step">${x.s}</span>`:''}<h1>${x.t}</h1><p>${x.p}</p><ol>${x.list.map(l=>`<li>${l}</li>`).join('')}</ol></div><div class="mock" dir="ltr" lang="en" role="img" aria-label="Illustration">${s.mock}</div></section>`}).join('');
+ const u=UI[lang];$('prev').textContent=u.back;$('next').textContent=u.next;$('play').textContent=playing?u.pause:u.play;$('lvo').textContent=u.vo;$('lsp').textContent=u.sp;document.title=u.title;document.documentElement.lang=lang;$('cap').dir=lang==='ar'?'rtl':'ltr'}
+function loadVoices(){if(!window.speechSynthesis){voices=[];return}
+ voices=speechSynthesis.getVoices().filter(v=>new RegExp('^'+lang,'i').test(v.lang));
+ $('vsel').innerHTML=voices.map((v,k)=>`<option value="${k}">${v.name} (${v.lang})</option>`).join('');
+ const k=voices.findIndex(v=>/Samantha|Daniel|Karen|Google US English|Google UK English|Aria|Jenny|Natural|Majed|Maged|Tarik|Laila|Hoda|Salma/i.test(v.name));if(k>=0)$('vsel').value=k;
+ $('vnote').textContent=voices.length?'':UI[lang].nov}
+if(window.speechSynthesis){speechSynthesis.onvoiceschanged=loadVoices}else{$('voice').checked=false;$('voice').disabled=true}
+function speak(text,my,done){speechSynthesis.cancel();const u=new SpeechSynthesisUtterance(text);const v=voices[$('vsel').value];
+ if(v){u.voice=v;u.lang=v.lang}else u.lang=lang==='ar'?'ar-SA':'en-US';u.rate=+$('rate').value;
+ const fin=()=>{if(my===run)done()};u.onend=fin;u.onerror=fin;speechSynthesis.speak(u)}
+function advance(my){if(playing&&my===run)timer=setTimeout(()=>{if(i<S.length-1)show(i+1);else stop()},1200)}
+function show(n,silent){i=Math.max(0,Math.min(S.length-1,n));document.querySelectorAll('.slide').forEach((e,k)=>e.classList.toggle('on',k===i));
+ $('cap').textContent=X(i).cap;$('count').textContent=`${i+1} / ${S.length}`;$('pg').style.width=((i+1)/S.length*100)+'%';
+ if(silent)return;const my=++run;clearTimeout(timer);if(window.speechSynthesis)speechSynthesis.cancel();
+ if($('voice').checked&&voices.length)speak(VOt(i),my,()=>advance(my));
+ else if(playing)timer=setTimeout(()=>advance(my),Math.max(6000,VOt(i).length*65))}
+function stop(){playing=false;run++;clearTimeout(timer);if(window.speechSynthesis)speechSynthesis.cancel();$('play').textContent=UI[lang].play}
+$('play').onclick=()=>{if(playing)return stop();playing=true;if(i===S.length-1)i=0;$('play').textContent=UI[lang].pause;show(i)};
+$('next').onclick=()=>{stop();show(i+1)};$('prev').onclick=()=>{stop();show(i-1)};
+$('vsel').onchange=()=>{if(playing||$('voice').checked)show(i)};
+$('lang').onchange=()=>{stop();lang=$('lang').value;render();loadVoices();show(i,true)};
+addEventListener('keydown',e=>{if(e.key==='ArrowRight'){stop();show(i+1)}if(e.key==='ArrowLeft'){stop();show(i-1)}if(e.key===' '&&!/BUTTON|SELECT|INPUT/.test(e.target.tagName)){e.preventDefault();$('play').click()}});
+render();loadVoices();show(0,true);
+</script>
+</body>
+</html>
